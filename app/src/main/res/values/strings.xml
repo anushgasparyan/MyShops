@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Elite Home</string>
+    <string-array
+        name="categories">
+        <item>Set</item>
+        <item>Sofa</item>
+        <item>Armchair</item>
+        <item>Table</item>
+        <item>Chair</item>
+        <item>PC_chair</item>
+        <item>Bed</item>
+        <item>Wardrobe</item>
+        <item>Side_table</item>
+        <item>Dressing_table</item>
+        <item>Mirror</item>
+        <item>Lamp</item>
+    </string-array>
+    <string-array
+        name="price">
+        <item>AMD</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>RUB</item>
+    </string-array>
+</resources>
