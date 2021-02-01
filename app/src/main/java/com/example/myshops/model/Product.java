@@ -1,6 +1,8 @@
 package com.example.myshops.model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class Product {
     private String id;
@@ -13,11 +15,12 @@ public class Product {
     private int count;
     private int active;
     private String date;
+    private List<String> productImgs;
 
     public Product() {
     }
 
-    public Product(String id, String name, String desc, String userID, Category category, Currency currency, double price, int count, int active, String date) {
+    public Product(String id, String name, String desc, String userID, Category category, Currency currency, double price, int count, int active, String date, List<String> productImgs) {
         this.id = id;
         this.name = name;
         this.desc = desc;
@@ -28,6 +31,15 @@ public class Product {
         this.count = count;
         this.active = active;
         this.date = date;
+        this.productImgs = productImgs;
+    }
+
+    public List<String> getProductImgs() {
+        return productImgs;
+    }
+
+    public void setProductImgs(List<String> productImgs) {
+        this.productImgs = productImgs;
     }
 
     public String getId() {
@@ -108,5 +120,22 @@ public class Product {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
+                ", userID='" + userID + '\'' +
+                ", category=" + category +
+                ", currency=" + currency +
+                ", price=" + price +
+                ", count=" + count +
+                ", active=" + active +
+                ", date='" + date + '\'' +
+                ", productImgs=" + productImgs +
+                '}';
     }
 }

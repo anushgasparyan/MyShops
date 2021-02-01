@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); //bellow setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.titlebar);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "msg", Toast.LENGTH_SHORT).show();
                     }
                 });
-        Token.currentToken = FirebaseInstanceId.getInstance().getToken();
-        Log.e("my", Token.currentToken);
     }
 
 

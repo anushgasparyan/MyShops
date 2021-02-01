@@ -7,19 +7,29 @@ public class User {
     private String email;
     private String password;
     private int active;
+    private String url;
     private Type type;
 
     public User() {
     }
 
-    public User(String id, String name, String surname, String email, String password, int active, Type type) {
+    public User(String id, String name, String surname, String email, String password, int active, String url, Type type) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
         this.active = active;
+        this.url = url;
         this.type = type;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getId() {

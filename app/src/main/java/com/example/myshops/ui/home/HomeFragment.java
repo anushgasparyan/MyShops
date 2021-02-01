@@ -1,15 +1,18 @@
 package com.example.myshops.ui.home;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,16 +21,30 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.myshops.CustomAdapter;
+import com.example.myshops.MainActivity;
+import com.example.myshops.ProductShow;
 import com.example.myshops.R;
+import com.example.myshops.model.Product;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class HomeFragment extends Fragment {
 
@@ -37,7 +54,11 @@ public class HomeFragment extends Fragment {
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
     GridView gridView;
-    int[] products;
+    LinearLayout sets, sofa, armchair, table, chair, compchair, bed, wardrobe, sidetable, dressingtable, mirror, lamp;
+    List<LinearLayout> categories, selected_categories;
+    ArrayList<Product> in=new ArrayList<>();
+    CustomAdapter customAdapter;
+    String email;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -45,91 +66,80 @@ public class HomeFragment extends Fragment {
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         gridView = root.findViewById(R.id.simpleGridView);
-        products = new int[]{R.mipmap.f1_foreground, R.mipmap.f2_foreground, R.mipmap.f3_foreground, R.mipmap.f4_foreground, R.mipmap.f5_foreground};
-        CustomAdapter customAdapter = new CustomAdapter(getContext(), products);
-        gridView.setAdapter(customAdapter);
-
-//        firebaseStorage = FirebaseStorage.getInstance();
-//        imageView = root.findViewById(R.id.imageView);
-//        button = root.findViewById(R.id.button);
-//        button2 = root.findViewById(R.id.button2);
-
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent();
-//                i.setType("image/*");
-//                i.setAction(Intent.ACTION_GET_CONTENT);
-//                startActivityForResult(Intent.createChooser(i, "Select picture"), 1);
-//
-//            }
-//        });
-//        button2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String notID = "com.example.android14";
-//                Intent intent = new Intent(getContext(), MainActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, 0);
-//
-//
-//                NotificationCompat.Builder builder =
-//                        new NotificationCompat.Builder(requireContext(), notID)
-//                                .setAutoCancel(true)
-//                                .setDefaults(Notification.DEFAULT_ALL)
-//                                .setSmallIcon(R.drawable.person)
-//                                .setContentInfo("info")
-//                                .setWhen(System.currentTimeMillis())
-//                                .setContentTitle("Title")
-//                                .setContentText("Notification text")
-//                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                                .setSubText("Good")
-//                                .setContentIntent(pendingIntent);
-//
-//                NotificationManager notificationManager =
-//                        (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    String channelId = "Your_channel_id";
-//                    NotificationChannel channel = new NotificationChannel(
-//                            channelId,
-//                            "Channel human readable title",
-//                            NotificationManager.IMPORTANCE_HIGH);
-//                    notificationManager.createNotificationChannel(channel);
-//                    builder.setChannelId(channelId);
-//                }
-//                notificationManager.notify(1, builder.build());
-//            }
-//        });
-        return root;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        storageReference = firebaseStorage.getReference("images/" + UUID.randomUUID().toString());
-        if (requestCode == 1) {
-            UploadTask uploadTask = storageReference.putFile(data.getData());
-            Task<Uri> task = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+        categories = new ArrayList<>();
+        selected_categories = new ArrayList<>();
+        sets = root.findViewById(R.id.sets);
+        sofa = root.findViewById(R.id.sofa);
+        armchair = root.findViewById(R.id.armchair);
+        table = root.findViewById(R.id.table);
+        chair = root.findViewById(R.id.chair);
+        compchair = root.findViewById(R.id.compchair);
+        bed = root.findViewById(R.id.bed);
+        wardrobe = root.findViewById(R.id.wardrobe);
+        sidetable = root.findViewById(R.id.sidetable);
+        dressingtable = root.findViewById(R.id.dressingtable);
+        mirror = root.findViewById(R.id.mirror);
+        lamp = root.findViewById(R.id.lamp);
+        categories.add(sets);
+        categories.add(sofa);
+        categories.add(armchair);
+        categories.add(table);
+        categories.add(chair);
+        categories.add(compchair);
+        categories.add(bed);
+        categories.add(wardrobe);
+        categories.add(sidetable);
+        categories.add(dressingtable);
+        categories.add(mirror);
+        categories.add(lamp);
+        SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
+        email = prefs.getString("email", "");
+        for (LinearLayout category : categories) {
+            category.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Success", Toast.LENGTH_LONG).show();
-                    }
-                    return storageReference.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Log.d("my", task.getResult().toString());
-                        String file_url = task.getResult().toString().substring(0, task.getResult().toString().indexOf("token"));
-
-                        Picasso.get().load(file_url).into(imageView);
+                public void onClick(View v) {
+                    if(v.isSelected()){
+                        selected_categories.remove(category);
+                        Toast.makeText(getContext(), String.valueOf(v.isSelected()), Toast.LENGTH_LONG).show();
+                    }else {
+                        for (LinearLayout cat : categories) {
+                            cat.setSelected(false);
+                        }
+                        v.setSelected(true);
+                        selected_categories.clear();
+                        selected_categories.add(category);
+                        Toast.makeText(getContext(), String.valueOf(v.isSelected()), Toast.LENGTH_LONG).show();
                     }
                 }
             });
         }
 
 
+
+        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
+        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        query2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Product p = child.getValue(Product.class);
+                        Log.d("prod", p.toString());
+                        in.add(p);
+                    }
+                    customAdapter = new CustomAdapter(getContext(), in, email);
+                    gridView.setAdapter(customAdapter);
+                    Log.d("prod", in.toString());
+                }
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+
+        return root;
     }
+
 }

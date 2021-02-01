@@ -4,14 +4,16 @@ public class Wishlist {
     private String id;
     private String productID;
     private String userID;
+    private String id_id;
 
     public Wishlist() {
     }
 
-    public Wishlist(String id, String productID, String userID) {
+    public Wishlist(String id, String productID, String userID, String id_id) {
         this.id = id;
         this.productID = productID;
         this.userID = userID;
+        this.id_id = id_id;
     }
 
     public String getId() {
@@ -36,5 +38,13 @@ public class Wishlist {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getId_id() {
+        return id_id;
+    }
+
+    public void setId_id(String id_id) {
+        this.id_id = id_id;
     }
 }

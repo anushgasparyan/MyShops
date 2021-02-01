@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Elite Home</string>
-    <string-array
-        name="categories">
+    <string name="change_photo"><u>Change photo</u></string>
+    <string-array name="categories">
         <item>Set</item>
         <item>Sofa</item>
         <item>Armchair</item>
@@ -15,11 +15,19 @@
         <item>Mirror</item>
         <item>Lamp</item>
     </string-array>
-    <string-array
-        name="price">
+    <string-array name="price">
         <item>AMD</item>
         <item>USD</item>
         <item>EUR</item>
         <item>RUB</item>
     </string-array>
+    <string name="title_activity_product_show">ProductShow</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>
