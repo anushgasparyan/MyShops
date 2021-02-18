@@ -5,48 +5,38 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.example.myshops.model.Product;
-import com.example.myshops.model.ProductImg;
-import com.example.myshops.model.User;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.example.myshops.ui.home.HomeFragment;
+import com.example.myshops.ui.productshow.ProductShowFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class CustomAdapter extends BaseAdapter {
+public class CustomAdapter extends BaseAdapter implements Filterable {
 
     Context c;
     ArrayList<Product> products;
+    ArrayList<Product> productsFilter;
     String email;
 
     public CustomAdapter(Context c, ArrayList<Product> products, String email) {
         this.c = c;
         this.products = products;
+        this.productsFilter = products;
         this.email = email;
         Log.d("prod", this.products.toString());
     }
@@ -78,7 +68,7 @@ public class CustomAdapter extends BaseAdapter {
         final Product p = (Product) this.getItem(i);
 
         TextView nameTxt = view.findViewById(R.id.name);
-        TextView price = view.findViewById(R.id.price);
+        TextView price = view.findViewById(R.id.desc);
         ImageView img = view.findViewById(R.id.icon);
 
         nameTxt.setText(p.getName());
@@ -93,14 +83,46 @@ public class CustomAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), ProductShow.class);
-                intent.putExtra("productid", p.getId());
-                intent.putExtra("useremail", email);
-                Log.e("ids", p.getName());
-                c.startActivity(intent);
+                SharedPreferences.Editor preferences = c.getSharedPreferences("MYPREF", Context.MODE_PRIVATE).edit();
+                preferences.putString("productid", p.getId()).apply();
+                preferences.putString("useremail", email).apply();
+                preferences.putString("from", "home").apply();
+                ((MainActivity)c).replaceFragments(ProductShowFragment.class);
             }
         });
         return view;
     }
 
+
+    @Override
+    public Filter getFilter() {
+        Filter filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults filterResults = new FilterResults();
+                if (constraint == null || constraint.length() == 0) {
+                    filterResults.count = productsFilter.size();
+                    filterResults.values = productsFilter;
+                } else {
+                    String search = constraint.toString().toLowerCase();
+                    List<Product> searchResults = new ArrayList<>();
+                    for (Product product : productsFilter) {
+                        if (product.getName().contains(search) || product.getDesc().contains(search)) {
+                            searchResults.add(product);
+                        }
+                    }
+                    filterResults.count = searchResults.size();
+                    filterResults.values = searchResults;
+                }
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                products = (ArrayList<Product>) results.values;
+                notifyDataSetChanged();
+            }
+        };
+        return filter;
+    }
 }

@@ -38,8 +38,13 @@ import com.example.myshops.MainActivity;
 import com.example.myshops.R;
 import com.example.myshops.model.Product;
 import com.example.myshops.model.User;
+import com.example.myshops.ui.basket.BasketFragment;
 import com.example.myshops.ui.home.HomeFragment;
 import com.example.myshops.ui.login.LoginFragment;
+import com.example.myshops.ui.myorders.MyOrdersFragment;
+import com.example.myshops.ui.notifications.NotificationsFragment;
+import com.example.myshops.ui.settings.SettingsFragment;
+import com.example.myshops.ui.wishlist.WishlistFragment;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -75,48 +80,36 @@ public class AccountFragment extends Fragment {
     ImageView profile_img;
     ProgressDialog progressDialog;
     String email;
+    Button myproducts, favorites, myorders, basket, notifications, cards, settings, del, logout;
+    TextView name_surname, mail, changephoto;
 
     private static final int PICK_IMG = 1;
-
-    private AccountViewModel accountViewModel;
 
     @SuppressLint("SetTextI18n")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        accountViewModel =
-                ViewModelProviders.of(this).get(AccountViewModel.class);
         root = inflater.inflate(R.layout.fragment_account, container, false);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMax(100);
         progressDialog.setMessage("Please wait");
         progressDialog.setTitle("Loading your data");
-        progressDialog.show();
-        final TextView textView = root.findViewById(R.id.text);
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         email = prefs.getString("email", "");
         Log.e("email", email);
 
-        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("user");
-        Query query2 = databaseReference2.orderByChild("email").equalTo(email);
-        query2.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.e("email", String.valueOf(snapshot) + " esia");
-                if (snapshot.exists()) {
-                    Log.e("email", String.valueOf(snapshot));
-                    for (DataSnapshot child : snapshot.getChildren()) {
-                        user = child.getValue(User.class);
-                        Log.e("email", "user " + String.valueOf(user));
-                        progressDialog.dismiss();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
+        del = root.findViewById(R.id.deletephoto);
+        logout = root.findViewById(R.id.logout);
+        name_surname = root.findViewById(R.id.namesurname);
+        mail = root.findViewById(R.id.email);
+        changephoto = root.findViewById(R.id.changephoto);
+        profile_img = root.findViewById(R.id.profile_image);
+        myproducts = root.findViewById(R.id.myproducts);
+        favorites = root.findViewById(R.id.favorites);
+        myorders = root.findViewById(R.id.myorders);
+        basket = root.findViewById(R.id.basket);
+        notifications = root.findViewById(R.id.notifications);
+        cards = root.findViewById(R.id.cards);
+        settings = root.findViewById(R.id.settings);
 
         if (email.isEmpty()) {
             builder = new AlertDialog.Builder(getContext());
@@ -140,68 +133,111 @@ public class AccountFragment extends Fragment {
             BottomNavigationView navigationView = (BottomNavigationView) getActivity().findViewById(R.id.nav_view);
             navigationView.getMenu().getItem(0).setChecked(true);
             ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
-        }
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final TextView name_surname = root.findViewById(R.id.namesurname);
-                final TextView mail = root.findViewById(R.id.email);
-                profile_img = root.findViewById(R.id.profile_image);
-                final TextView changephoto = root.findViewById(R.id.changephoto);
-                final Button del = root.findViewById(R.id.deletephoto);
-                final Button logout = root.findViewById(R.id.logout);
-                if (user != null) {
-                    name_surname.setText(user.getName() + " " + user.getSurname());
-                    mail.setText(user.getEmail());
-                    if (user.getUrl() != null) {
-                        Picasso.get().load(user.getUrl())
-                                .resize(120, 120)
-                                .centerCrop()
-                                .into(profile_img);
-                    } else {
-                        profile_img.setImageResource(R.mipmap.userlogooo_foreground);
+        } else {
+            DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("user");
+            Query query2 = databaseReference2.orderByChild("email").equalTo(email);
+            query2.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    progressDialog.show();
+                    Log.e("email", String.valueOf(snapshot) + " esia");
+                    if (snapshot.exists()) {
+                        Log.e("email", String.valueOf(snapshot));
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            user = child.getValue(User.class);
+                            Log.e("email", "user " + String.valueOf(user));
+                            progressDialog.dismiss();
+                        }
                     }
-                    del.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            profile_img.setImageResource(R.mipmap.userlogooo_foreground);
-                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference reference = database.getReference().child("user");
-                            reference.child(user.getId()).child("url").removeValue();
-                        }
-                    });
-                    changephoto.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent i = new Intent();
-                            i.setType("image/*");
-                            i.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(i, "Select picture"), PICK_IMG);
-                        }
-                    });
-
-                    auth = FirebaseAuth.getInstance();
-                    logout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            auth.signOut();
-                            SharedPreferences.Editor preferences = requireActivity().getSharedPreferences("MYPREF", Context.MODE_PRIVATE).edit();
-                            preferences.putString("email", "").apply();
-                            ((MainActivity) requireActivity()).replaceFragments(LoginFragment.class);
-                        }
-                    });
                 }
-            }
-        }, 1000);
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (user != null) {
+                        name_surname.setText(user.getName() + " " + user.getSurname());
+                        mail.setText(user.getEmail());
+                        if (user.getUrl() != null) {
+                            Picasso.get().load(user.getUrl())
+                                    .resize(120, 120)
+                                    .centerCrop()
+                                    .into(profile_img);
+                        } else {
+                            profile_img.setImageResource(R.drawable.person);
+                        }
+                        del.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                profile_img.setImageResource(R.drawable.person);
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference reference = database.getReference().child("user");
+                                reference.child(user.getId()).child("url").removeValue();
+                            }
+                        });
+                        changephoto.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent();
+                                i.setType("image/*");
+                                i.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(i, "Select picture"), PICK_IMG);
+                            }
+                        });
+
+                        auth = FirebaseAuth.getInstance();
+                        logout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                auth.signOut();
+                                SharedPreferences.Editor preferences = requireActivity().getSharedPreferences("MYPREF", Context.MODE_PRIVATE).edit();
+                                preferences.putString("email", "").apply();
+                                ((MainActivity) requireActivity()).replaceFragments(LoginFragment.class);
+                            }
+                        });
+                        basket.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(BasketFragment.class);
+                            }
+                        });
+                        favorites.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(WishlistFragment.class);
+                            }
+                        });
+                        myorders.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(MyOrdersFragment.class);
+                            }
+                        });
+                        notifications.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(NotificationsFragment.class);
+                            }
+                        });
+                        settings.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(SettingsFragment.class);
+
+                            }
+                        });
+                    }
+                }
+            }, 200);
+
+        }
 
 
-        accountViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
         return root;
     }
 

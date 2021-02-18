@@ -1,35 +1,175 @@
 package com.example.myshops.ui.search;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SearchView;
+
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.myshops.CustomAdapter;
 import com.example.myshops.R;
+import com.example.myshops.model.Product;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SearchFragment extends Fragment {
 
     private SearchViewModel searchViewModel;
+    GridView gridView;
+    SearchView search;
+    ImageView filter;
+    String email;
+    CustomAdapter customAdapter;
+    ArrayList<Product> in;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
-        final TextView textView = root.findViewById(R.id.text);
-        searchViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+
+        gridView = root.findViewById(R.id.simpleGridView);
+        SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
+        email = prefs.getString("email", "");
+        in = new ArrayList<>();
+        search = root.findViewById(R.id.search);
+        filter = root.findViewById(R.id.filter);
+        search.setQueryHint("What are you looking for?");
+        search.onActionViewExpanded();
+        View view = getLayoutInflater().inflate(R.layout.filter, null);
+        SeekBar seekBar = view.findViewById(R.id.seekBar);
+        TextView seekbarprogress = view.findViewById(R.id.progress);
+        TextView ok = view.findViewById(R.id.OK);
+        TextView cancel = view.findViewById(R.id.cancel);
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
+        alert.setView(view);
+        AlertDialog alertDialog = alert.create();
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                p(seekBar.getProgress());
+                alertDialog.dismiss();
+            }
+        });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                // TODO Auto-generated method stub
+                seekbarprogress.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+        });
+        filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.show();
+            }
+        });
+        if(!search.isFocused()) {
+            search.clearFocus();
+        }
+        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
+        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        query2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Product p = child.getValue(Product.class);
+                        Log.d("prod", p.toString());
+                        in.add(p);
+                    }
+                }
+                customAdapter = new CustomAdapter(getContext(), in, email);
+                gridView.setAdapter(customAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String arg0) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // TODO Auto-generated method stub
+
+                customAdapter.getFilter().filter(query);
+
+
+                return false;
             }
         });
         return root;
+    }
+
+    private void p(int progress) {
+        in.clear();
+        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
+        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        query2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Product p = child.getValue(Product.class);
+                        if (p.getPrice() <= progress) {
+                            in.add(p);
+                        }
+                    }
+                }
+                customAdapter = new CustomAdapter(getContext(), in, email);
+                gridView.setAdapter(customAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 }

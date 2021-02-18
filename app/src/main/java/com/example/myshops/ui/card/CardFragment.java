@@ -46,9 +46,8 @@ public class CardFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         String email = prefs.getString("email", "");
         if (email.isEmpty()) {
-            builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("You are not logged in!")
-                    .setMessage("Please log in to continue")
+            builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+            builder.setMessage("Please log in to continue")
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

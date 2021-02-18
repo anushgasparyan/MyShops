@@ -1,23 +1,15 @@
 package com.example.myshops.ui.addProduct;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,8 +57,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,10 +65,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
-import okio.Options;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -116,7 +104,7 @@ public class AddProductFragment extends Fragment {
         TextView textView = root.findViewById(R.id.text);
         TextView name = root.findViewById(R.id.name);
         TextView desc = root.findViewById(R.id.desc);
-        TextView price = root.findViewById(R.id.price);
+        TextView price = root.findViewById(R.id.desc);
         categories = root.findViewById(R.id.spinner);
         currency = root.findViewById(R.id.spinner2);
         List<String> cat = Arrays.asList(getResources().getStringArray(R.array.categories));
@@ -132,9 +120,8 @@ public class AddProductFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         String email = prefs.getString("email", "");
         if (email.isEmpty()) {
-            builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("You are not logged in!")
-                    .setMessage("Please log in to continue")
+            builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+            builder.setMessage("Please log in to continue")
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -154,7 +141,6 @@ public class AddProductFragment extends Fragment {
             navigationView.getMenu().getItem(0).setChecked(true);
             ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
         }else {
-
             apiService = Token.getFCMClient();
             auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference().child("user");
@@ -175,8 +161,6 @@ public class AddProductFragment extends Fragment {
                     }
                 });
             }
-
-
             add = root.findViewById(R.id.add);
             add.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("SetTextI18n")
@@ -262,7 +246,6 @@ public class AddProductFragment extends Fragment {
                                     layout.removeAllViews();
                                     textView1.setText("");
                                     Toast.makeText(getContext(), "Successfully added!", Toast.LENGTH_LONG).show();
-//                                progressDialog.dismiss();
                                     ImageList.clear();
                                     strings.clear();
                                     uploads = 0;

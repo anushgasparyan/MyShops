@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/price"
+                        android:id="@+id/desc"
                         android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="cursive"

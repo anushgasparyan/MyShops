@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/f1_foreground"
+    android:background="@mipmap/pinkbg_foreground"
     android:gravity="center"
     android:id="@+id/linear"
     android:orientation="vertical">
@@ -107,7 +107,7 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/price"
+                    android:id="@+id/desc"
                     android:layout_width="199dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/price"

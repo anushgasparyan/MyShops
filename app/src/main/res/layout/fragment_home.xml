@@ -40,6 +40,13 @@
                     android:textAlignment="center"
                     android:textColor="#555555" />
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Set"
+                    android:visibility="invisible" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -62,6 +69,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sofa"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -84,6 +98,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Armchair"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -106,6 +127,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Table"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -128,6 +156,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView17"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chair"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -150,6 +185,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView18"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="PC_chair"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -172,6 +214,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bed"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -194,6 +243,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wardrobe"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -216,6 +272,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView21"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Side_table"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -239,6 +302,13 @@
                     android:textAlignment="center"
                     android:textColor="#555555" />
 
+                <TextView
+                    android:id="@+id/textView22"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dress_table"
+                    android:visibility="invisible" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -261,6 +331,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView23"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mirror"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -283,6 +360,13 @@
                     android:fontFamily="cursive"
                     android:textAlignment="center"
                     android:textColor="#555555" />
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lamp"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
