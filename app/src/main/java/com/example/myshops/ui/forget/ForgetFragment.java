@@ -34,7 +34,7 @@ public class ForgetFragment extends Fragment {
                 ViewModelProviders.of(this).get(ForgetViewModel.class);
         View root = inflater.inflate(R.layout.fragment_forget, container, false);
         final TextView textView = root.findViewById(R.id.text);
-        final EditText login = root.findViewById(R.id.login);
+        final EditText login = root.findViewById(R.id.name);
         final Button change = root.findViewById(R.id.change);
         final Button signin = root.findViewById(R.id.signin);
         auth = FirebaseAuth.getInstance();
@@ -58,8 +58,6 @@ public class ForgetFragment extends Fragment {
                         }
                     }
                 });
-//                SendMail sendMail = new SendMail(getContext(), email, "Forget password", "Change your password here");
-//                sendMail.execute();
             }
         });
         forgetViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {

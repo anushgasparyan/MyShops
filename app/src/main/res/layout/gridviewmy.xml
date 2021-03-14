@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,6 +19,7 @@
             android:layout_height="100dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/myimagess"
             android:orientation="horizontal">
 
@@ -30,7 +31,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="230dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="#05CFCFCF"
@@ -39,7 +40,7 @@
 
             <TextView
                 android:id="@+id/name"
-                android:layout_width="210dp"
+                android:layout_width="230dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:fontFamily="cursive"
@@ -47,7 +48,7 @@
                 android:scaleType="fitXY"
                 android:textAlignment="viewStart"
                 android:textColor="#000000"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 tools:ignore="RtlCompat" />
 
             <ScrollView
@@ -61,7 +62,7 @@
 
                     <TextView
                         android:id="@+id/price"
-                        android:layout_width="210dp"
+                        android:layout_width="230dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:fontFamily="cursive"
@@ -77,39 +78,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/feedback"
-                        android:layout_width="210dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:fontFamily="cursive"
-                        android:scaleType="fitXY"
-                        android:textAlignment="viewStart"
-                        android:textColor="#000000" />
-
-                </LinearLayout>
+                    android:orientation="vertical"/>
             </ScrollView>
 
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/deletefrombasket"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="362dp"
-            android:background="@drawable/myalerts"
-            android:text="x"
-            android:textSize="10sp" />
-
     </LinearLayout>
 
     <View
-    android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:background="@android:color/darker_gray" />
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
-</RelativeLayout>
+</LinearLayout>

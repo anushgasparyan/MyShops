@@ -1,5 +1,6 @@
 package com.example.myshops.ui.search;
 
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
 import android.widget.ImageView;
@@ -35,23 +37,29 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SearchFragment extends Fragment {
 
-    private SearchViewModel searchViewModel;
     GridView gridView;
     SearchView search;
     ImageView filter;
-    String email;
+    String email, id;
     CustomAdapter customAdapter;
     ArrayList<Product> in;
+    ProgressDialog progressDialog;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        searchViewModel =
-                ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
-
+        setHasOptionsMenu(false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMax(100);
+        progressDialog.setMessage("Please wait");
+        progressDialog.setTitle("Loading...");
+        progressDialog.show();
         gridView = root.findViewById(R.id.simpleGridView);
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         email = prefs.getString("email", "");
+        id = prefs.getString("id", "");
         in = new ArrayList<>();
         search = root.findViewById(R.id.search);
         filter = root.findViewById(R.id.filter);
@@ -107,19 +115,21 @@ public class SearchFragment extends Fragment {
             search.clearFocus();
         }
         DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
-        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        Query query2 = databaseReference2.orderByChild("active").equalTo(1);
         query2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         Product p = child.getValue(Product.class);
-                        Log.d("prod", p.toString());
-                        in.add(p);
+                        if (!p.getUserID().equals(id)) {
+                            in.add(p);
+                        }
                     }
                 }
                 customAdapter = new CustomAdapter(getContext(), in, email);
                 gridView.setAdapter(customAdapter);
+                progressDialog.dismiss();
 
             }
 
@@ -149,9 +159,10 @@ public class SearchFragment extends Fragment {
     }
 
     private void p(int progress) {
+        progressDialog.show();
         in.clear();
         DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
-        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        Query query2 = databaseReference2.orderByChild("active").equalTo(1);
         query2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -159,12 +170,15 @@ public class SearchFragment extends Fragment {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         Product p = child.getValue(Product.class);
                         if (p.getPrice() <= progress) {
-                            in.add(p);
+                            if (!p.getUserID().equals(id)) {
+                                in.add(p);
+                            }
                         }
                     }
                 }
                 customAdapter = new CustomAdapter(getContext(), in, email);
                 gridView.setAdapter(customAdapter);
+                progressDialog.dismiss();
             }
 
             @Override

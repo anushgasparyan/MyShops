@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +79,6 @@ public class AddProductFragment extends Fragment {
 
     private AddProductViewModel addProductViewModel;
     AlertDialog.Builder builder;
-    StorageReference storageReference;
     Button add;
     private static final int PICK_IMG = 1;
     private ArrayList<Uri> ImageList = new ArrayList<Uri>();
@@ -89,12 +90,10 @@ public class AddProductFragment extends Fragment {
     int CurrentImageSelect;
     TextView textView1;
     Spinner categories, currency;
-    ImageView imageView;
     NumberPicker numberPicker;
     FirebaseAuth auth;
     User user;
     ApiService apiService;
-    Uri uri;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -103,8 +102,8 @@ public class AddProductFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_addproduct, container, false);
         TextView textView = root.findViewById(R.id.text);
         TextView name = root.findViewById(R.id.name);
-        TextView desc = root.findViewById(R.id.desc);
-        TextView price = root.findViewById(R.id.desc);
+        TextView desc = root.findViewById(R.id.feedback);
+        TextView price = root.findViewById(R.id.price);
         categories = root.findViewById(R.id.spinner);
         currency = root.findViewById(R.id.spinner2);
         List<String> cat = Arrays.asList(getResources().getStringArray(R.array.categories));
@@ -140,7 +139,7 @@ public class AddProductFragment extends Fragment {
             BottomNavigationView navigationView = getActivity().findViewById(R.id.nav_view);
             navigationView.getMenu().getItem(0).setChecked(true);
             ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
-        }else {
+        } else {
             apiService = Token.getFCMClient();
             auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference().child("user");
@@ -187,7 +186,6 @@ public class AddProductFragment extends Fragment {
                             final int[] s = {0};
                             for (uploads = 0; uploads < ImageList.size(); uploads++) {
                                 final StorageReference imagename = ImageFolder.child("image/" + UUID.randomUUID() + System.currentTimeMillis());
-                                Log.d("myss", String.valueOf(ImageList.get(uploads)));
                                 imagename.putFile(ImageList.get(uploads)).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -195,15 +193,14 @@ public class AddProductFragment extends Fragment {
                                             @Override
                                             public void onSuccess(Uri uri) {
                                                 String url = String.valueOf(uri);
-                                                Log.e("myss", url);
                                                 s[0] += 1;
                                                 if (ImageList.size() == s[0]) {
-                                                    Log.d("myss", Arrays.toString(s));
                                                     progressDialog.dismiss();
+                                                    Toast.makeText(getContext(), "Successfully added!", Toast.LENGTH_LONG).show();
+                                                    textView.setText("ADD A NEW PRODUCT");
                                                 }
                                                 strings.add(url);
                                                 product.setProductImgs(strings);
-                                                Log.e("my", product.toString());
                                                 Map<String, Object> map = new HashMap<>();
                                                 map.put("productImgs", product.getProductImgs());
                                                 databaseReference.updateChildren(map);
@@ -215,23 +212,18 @@ public class AddProductFragment extends Fragment {
                                 });
                             }
 
-                            Log.e("my", strings.toString());
                             product.setProductImgs(strings);
-                            Log.e("my", product.toString());
 
                             databaseReference.setValue(product).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    Notification notification = new Notification(name.getText().toString(), desc.getText().toString());
+                                    Notification notification = new Notification("New Product", name.getText().toString());
                                     Sender sender = new Sender(notification, Token.currentToken);
-                                    Log.e("my", sender.to);
-                                    Log.e("my", sender.notification.body);
-                                    Log.e("my", sender.notification.title);
                                     apiService.sender(sender).enqueue(new Callback<Response>() {
                                         @Override
                                         public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
                                             if (response.body().success == 1) {
-                                                Toast.makeText(getContext(), "send notification", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(getContext(), "Notification sent", Toast.LENGTH_SHORT).show();
                                             }
                                         }
 
@@ -245,10 +237,16 @@ public class AddProductFragment extends Fragment {
                                     numberPicker.setValue(1);
                                     layout.removeAllViews();
                                     textView1.setText("");
-                                    Toast.makeText(getContext(), "Successfully added!", Toast.LENGTH_LONG).show();
-                                    ImageList.clear();
-                                    strings.clear();
-                                    uploads = 0;
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.e("ttt", "jnjveeeec");
+                                            ImageList.clear();
+                                            strings.clear();
+                                            uploads = 0;
+                                        }
+                                    }, 5000);
                                 }
                             });
 
@@ -281,7 +279,6 @@ public class AddProductFragment extends Fragment {
                     ((EditText) child).setTextColor(Color.BLACK);
             }
 
-
             final Button addphoto = root.findViewById(R.id.addphoto);
             addphoto.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -306,14 +303,21 @@ public class AddProductFragment extends Fragment {
     }
 
 
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMG) {
             if (resultCode == RESULT_OK) {
-                if (data.getClipData() != null) {
+                if (data.getClipData() == null) {
+                    if (data.getData() != null) {
+                        Uri imageuri = data.getData();
+                        CurrentImageSelect = 1;
+                        ImageList.add(imageuri);
+                        textView1.setVisibility(View.VISIBLE);
+                        textView1.setText("You have Selected " + ImageList.size() + " picture");
+                    }
+                } else {
                     int count = data.getClipData().getItemCount();
                     CurrentImageSelect = 0;
                     while (CurrentImageSelect < count) {
@@ -336,21 +340,16 @@ public class AddProductFragment extends Fragment {
             imgView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Toast t = new Toast(getContext());
-//                    LayoutInflater factory = LayoutInflater.from(getContext());
-//                    final View view = factory.inflate(R.layout.img, null);
-//                    imageView = view.findViewById(R.id.bigimg);
-//                    imageView.setImageURI(uri);
-//                    t.setView(view);
-//                    t.setGravity(Gravity.FILL, 0, 0);
-//                    t.show();
+                    Toast t = new Toast(getContext());
+                    LayoutInflater factory = LayoutInflater.from(getContext());
+                    final View view = factory.inflate(R.layout.img, null);
+                    ImageView imageView = view.findViewById(R.id.imageshow);
+                    imageView.setImageURI(uri);
+                    t.setView(view);
+                    t.setGravity(Gravity.FILL, 0, 0);
+                    t.show();
                 }
             });
-
-
         }
-
     }
-
-
 }

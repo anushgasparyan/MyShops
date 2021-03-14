@@ -13,9 +13,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.example.myshops.model.Product;
-import com.example.myshops.ui.productshow.ProductShowFragment;
+import com.example.myshops.ui.notifications.NotificationsFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,17 +30,19 @@ import com.squareup.picasso.Picasso;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-public class CustomAdapterCard extends BaseAdapter {
+public class AdminAdapter extends BaseAdapter {
 
     Context c;
     ArrayList<Product> products;
     ArrayList<Product> productsFilter;
     String email;
 
-    public CustomAdapterCard(Context c, ArrayList<Product> products, String email) {
+    public AdminAdapter(Context c, ArrayList<Product> products, String email) {
         this.c = c;
         this.products = products;
         this.productsFilter = products;
@@ -46,7 +51,7 @@ public class CustomAdapterCard extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return products.size();
+        return products == null ? 0 : products.size();
     }
 
     @Override
@@ -64,41 +69,76 @@ public class CustomAdapterCard extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
 
         if (view == null) {
-            view = LayoutInflater.from(c).inflate(R.layout.gridviewcard, viewGroup, false);
+            view = LayoutInflater.from(c).inflate(R.layout.admingridview, viewGroup, false);
         }
+
         ProgressDialog mProgressDialog = new ProgressDialog(c, ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setMessage("Please Wait...");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
-
         final Product p = (Product) this.getItem(i);
 
         TextView nameTxt = view.findViewById(R.id.name);
         TextView price = view.findViewById(R.id.price);
-        TextView desc = view.findViewById(R.id.feedback);
-        Button del = view.findViewById(R.id.deletefrombasket);
         ImageView img = view.findViewById(R.id.icon);
+        Button accept = view.findViewById(R.id.accept);
+        Button decline = view.findViewById(R.id.decline);
 
         nameTxt.setText(p.getName());
         price.setText(p.getPrice() + " " + p.getCurrency());
-        desc.setText(p.getDesc());
         Picasso.get().load(p.getProductImgs().get(0))
                 .resize(180, 180)
                 .transform(new RoundedCornersTransformation(10, 1))
                 .centerCrop()
                 .into(img);
 
-        del.setOnClickListener(new View.OnClickListener() {
+        accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mProgressDialog.show();
+                DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("product");
+                Query query1 = databaseReference1.orderByChild("id").equalTo(p.getId());
+                query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot child : snapshot.getChildren()) {
+                                Map<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("active", 1);
+                                child.getRef().updateChildren(hashMap);
+                                Toast.makeText(c, "Product is accepted!", Toast.LENGTH_LONG).show();
+                                products.clear();
+                                notifyDataSetChanged();
+                                Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @SuppressLint("IntentReset")
+                                    @Override
+                                    public void run() {
+                                        mProgressDialog.dismiss();
+                                    }
+                                }, 500);
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            }
+        });
+        decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mProgressDialog.show();
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                Query query = ref.child("card").orderByChild("productID").equalTo(p.getId());
+                Query query = ref.child("product").orderByChild("id").equalTo(p.getId());
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             snapshot.getRef().removeValue();
                             products.clear();
                             notifyDataSetChanged();
@@ -107,6 +147,7 @@ public class CustomAdapterCard extends BaseAdapter {
                                 @Override
                                 public void run() {
                                     mProgressDialog.dismiss();
+                                    Toast.makeText(c, "Product is declined!", Toast.LENGTH_LONG).show();
                                 }
                             }, 500);
 
@@ -127,10 +168,11 @@ public class CustomAdapterCard extends BaseAdapter {
                 SharedPreferences.Editor preferences = c.getSharedPreferences("MYPREF", Context.MODE_PRIVATE).edit();
                 preferences.putString("productid", p.getId()).apply();
                 preferences.putString("useremail", email).apply();
-                preferences.putString("from", "basket").apply();
-                ((MainActivity)c).replaceFragments(ProductShowFragment.class);
+                ((MainActivity) c).replaceFragments(NotificationsFragment.class);
             }
         });
         return view;
     }
+
+
 }

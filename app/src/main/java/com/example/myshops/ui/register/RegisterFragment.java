@@ -44,7 +44,7 @@ public class RegisterFragment extends Fragment {
         final EditText name = root.findViewById(R.id.name);
         final EditText surname = root.findViewById(R.id.surname);
         final EditText email = root.findViewById(R.id.email);
-        final EditText password = root.findViewById(R.id.password);
+        final EditText password = root.findViewById(R.id.surname);
         final Button signup = root.findViewById(R.id.signin);
         final TextView signin = root.findViewById(R.id.change);
         auth = FirebaseAuth.getInstance();

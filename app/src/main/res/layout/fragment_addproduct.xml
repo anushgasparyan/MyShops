@@ -51,7 +51,7 @@
                 android:textColorHint="#9A9A9A" />
 
             <EditText
-                android:id="@+id/desc"
+                android:id="@+id/feedback"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginLeft="30dp"
@@ -107,9 +107,10 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/desc"
+                    android:id="@+id/price"
                     android:layout_width="199dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@drawable/price"
                     android:drawableLeft="@drawable/money"
                     android:ems="10"
@@ -122,10 +123,10 @@
 
                 <Spinner
                     android:id="@+id/spinner2"
-                    android:layout_width="match_parent"
+                    android:layout_width="120dp"
                     android:layout_height="40dp"
-                    android:theme="@style/Theme.AppCompat.Light"
-                    android:entries="@array/price" />
+                    android:entries="@array/price"
+                    android:theme="@style/Theme.AppCompat.Light" />
 
             </LinearLayout>
 

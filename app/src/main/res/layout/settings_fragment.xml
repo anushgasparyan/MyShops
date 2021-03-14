@@ -1,13 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/pinkbg_foreground"
+    android:orientation="vertical"
     tools:context=".ui.settings.SettingsFragment">
 
     <TextView
+        android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="cursive"
+        android:text="Change your data"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="30sp" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/myinputs"
+        android:drawableLeft="@drawable/a"
+        android:ems="10"
+        android:fontFamily="cursive"
+        android:hint="  Name"
+        android:inputType="textPersonName"
+        android:paddingLeft="10dp"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/surname"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/myinputs"
+        android:drawableLeft="@drawable/a"
+        android:ems="10"
+        android:fontFamily="cursive"
+        android:hint="  Surname"
+        android:inputType="textPersonName"
+        android:paddingLeft="10dp"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/change"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/mybuttons"
+        android:fontFamily="cursive"
+        android:text="Save changes"
+        android:textColor="#000000"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/text3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="cursive"
+        android:text="Change your password"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="30sp" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/myinputs"
+        android:drawableLeft="@drawable/ic_baseline_lock_24"
+        android:ems="10"
+        android:fontFamily="cursive"
+        android:hint="  New password"
+        android:inputType="textPassword"
+        android:paddingLeft="10dp"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/password2"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/myinputs"
+        android:drawableLeft="@drawable/ic_baseline_lock_24"
+        android:ems="10"
+        android:fontFamily="cursive"
+        android:hint="  Old password"
+        android:inputType="textPassword"
+        android:paddingLeft="10dp"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/change2"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/mybuttons"
+        android:fontFamily="cursive"
+        android:text="Save changes"
+        android:textColor="#000000"
+        android:textSize="14sp" />
+
+</LinearLayout>

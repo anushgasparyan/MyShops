@@ -28,5 +28,10 @@
         <item name="android:textColor">#000000</item>
     </style>
 
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">#A1A1A1</item>
+        <item name="colorControlActivated">#E4D4D4</item>
+    </style>
+
 
 </resources>

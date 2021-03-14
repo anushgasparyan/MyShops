@@ -15,33 +15,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <com.braintreepayments.cardform.view.CardholderNameEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/myinputs"
-                        android:drawableStart="@drawable/person"
-                        android:hint="  Cardholder name"
-                        android:paddingLeft="10dp" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginEnd="8dp"
-                android:textAlignment="center"
-                android:textSize="20sp"
+                android:fontFamily="cursive"
+                android:textColor="#555555"
+                android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +33,9 @@
             <com.braintreepayments.cardform.view.CardForm
                 android:id="@+id/card_form"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@drawable/mycard"
+                android:layout_margin="10dp">
 
             </com.braintreepayments.cardform.view.CardForm>
 
@@ -59,8 +44,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/mybuttons"
+                android:fontFamily="cursive"
                 android:text="PAY"
-                android:textColor="@color/colorPrimaryDark" />
+                android:textColor="#555555"
+                android:textSize="20sp" />
         </LinearLayout>
     </ScrollView>
 

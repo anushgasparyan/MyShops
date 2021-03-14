@@ -1,8 +1,9 @@
 package com.example.myshops.ui.home;
 
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.myshops.CustomAdapter;
@@ -37,11 +39,20 @@ public class HomeFragment extends Fragment {
     Category categoryyy;
     ArrayList<Product> in = new ArrayList<>();
     CustomAdapter customAdapter;
-    String email;
+    String email, id;
+    ProgressDialog progressDialog;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        setHasOptionsMenu(false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMax(100);
+        progressDialog.setMessage("Please wait");
+        progressDialog.setTitle("Loading...");
+        progressDialog.show();
         gridView = root.findViewById(R.id.simpleGridView);
         categories = new ArrayList<>();
         sets = root.findViewById(R.id.sets);
@@ -68,9 +79,20 @@ public class HomeFragment extends Fragment {
         categories.add(dressingtable);
         categories.add(mirror);
         categories.add(lamp);
-        p();
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         email = prefs.getString("email", "");
+        id = prefs.getString("id", "");
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                p();
+            }
+        }, 500);
+
+
         for (LinearLayout category : categories) {
             category.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,9 +117,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void cp(Category category) {
+        progressDialog.show();
         in.clear();
         DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
-        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        Query query2 = databaseReference2.orderByChild("active").equalTo(1);
         query2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -105,13 +128,15 @@ public class HomeFragment extends Fragment {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         Product p = child.getValue(Product.class);
                         if (p.getCategory() == category) {
-                            Log.d("prod", p.toString());
-                            in.add(p);
+                            if (!p.getUserID().equals(id)) {
+                                in.add(p);
+                            }
+
                         }
                     }
                     customAdapter = new CustomAdapter(getContext(), in, email);
                     gridView.setAdapter(customAdapter);
-                    Log.d("prod", in.toString());
+                    progressDialog.dismiss();
                 }
 
             }
@@ -123,22 +148,24 @@ public class HomeFragment extends Fragment {
     }
 
     private void p() {
+        progressDialog.show();
         in.clear();
         DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("product");
-        Query query2 = databaseReference2.orderByChild("active").equalTo(0);
+        Query query2 = databaseReference2.orderByChild("active").equalTo(1);
         query2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         Product p = child.getValue(Product.class);
-                        Log.d("prod", p.toString());
-                        in.add(p);
+                        if (!p.getUserID().equals(id)) {
+                            in.add(p);
+                        }
                     }
                 }
                     customAdapter = new CustomAdapter(getContext(), in, email);
                     gridView.setAdapter(customAdapter);
-                    Log.d("prod", in.toString());
+                    progressDialog.dismiss();
 
             }
 

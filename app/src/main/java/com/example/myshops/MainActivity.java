@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.annotation.NonNull;
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
                             Log.w("TAG", "Fetching FCM registration token failed", task.getException());
                             return;
                         }
-                        Toast.makeText(MainActivity.this, "msg", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

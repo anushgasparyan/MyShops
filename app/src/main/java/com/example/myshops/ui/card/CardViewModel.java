@@ -10,7 +10,7 @@ public class CardViewModel extends ViewModel {
 
     public CardViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("MY CARD");
+        mText.setValue("Payment method");
     }
 
     public LiveData<String> getText() {

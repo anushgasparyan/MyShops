@@ -7,48 +7,38 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
-import com.example.myshops.CustomAdapter;
 import com.example.myshops.MainActivity;
 import com.example.myshops.R;
-import com.example.myshops.model.Product;
+import com.example.myshops.model.Type;
 import com.example.myshops.model.User;
 import com.example.myshops.ui.basket.BasketFragment;
+import com.example.myshops.ui.card.CardFragment;
 import com.example.myshops.ui.home.HomeFragment;
 import com.example.myshops.ui.login.LoginFragment;
 import com.example.myshops.ui.myorders.MyOrdersFragment;
+import com.example.myshops.ui.myproducts.MyProductsFragment;
 import com.example.myshops.ui.notifications.NotificationsFragment;
 import com.example.myshops.ui.settings.SettingsFragment;
 import com.example.myshops.ui.wishlist.WishlistFragment;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,13 +51,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
@@ -80,7 +64,7 @@ public class AccountFragment extends Fragment {
     ImageView profile_img;
     ProgressDialog progressDialog;
     String email;
-    Button myproducts, favorites, myorders, basket, notifications, cards, settings, del, logout;
+    Button myproducts, favorites, myorders, basket, notifications, settings, del, logout;
     TextView name_surname, mail, changephoto;
 
     private static final int PICK_IMG = 1;
@@ -95,7 +79,6 @@ public class AccountFragment extends Fragment {
         progressDialog.setTitle("Loading your data");
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         email = prefs.getString("email", "");
-        Log.e("email", email);
 
         del = root.findViewById(R.id.deletephoto);
         logout = root.findViewById(R.id.logout);
@@ -108,7 +91,6 @@ public class AccountFragment extends Fragment {
         myorders = root.findViewById(R.id.myorders);
         basket = root.findViewById(R.id.basket);
         notifications = root.findViewById(R.id.notifications);
-        cards = root.findViewById(R.id.cards);
         settings = root.findViewById(R.id.settings);
 
         if (email.isEmpty()) {
@@ -134,19 +116,15 @@ public class AccountFragment extends Fragment {
             navigationView.getMenu().getItem(0).setChecked(true);
             ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
         } else {
+            progressDialog.show();
             DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("user");
             Query query2 = databaseReference2.orderByChild("email").equalTo(email);
-            query2.addValueEventListener(new ValueEventListener() {
+            query2.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    progressDialog.show();
-                    Log.e("email", String.valueOf(snapshot) + " esia");
                     if (snapshot.exists()) {
-                        Log.e("email", String.valueOf(snapshot));
                         for (DataSnapshot child : snapshot.getChildren()) {
                             user = child.getValue(User.class);
-                            Log.e("email", "user " + String.valueOf(user));
-                            progressDialog.dismiss();
                         }
                     }
                 }
@@ -168,8 +146,10 @@ public class AccountFragment extends Fragment {
                                     .resize(120, 120)
                                     .centerCrop()
                                     .into(profile_img);
+                            progressDialog.dismiss();
                         } else {
                             profile_img.setImageResource(R.drawable.person);
+                            progressDialog.dismiss();
                         }
                         del.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -197,6 +177,7 @@ public class AccountFragment extends Fragment {
                                 auth.signOut();
                                 SharedPreferences.Editor preferences = requireActivity().getSharedPreferences("MYPREF", Context.MODE_PRIVATE).edit();
                                 preferences.putString("email", "").apply();
+                                preferences.putString("id", "").apply();
                                 ((MainActivity) requireActivity()).replaceFragments(LoginFragment.class);
                             }
                         });
@@ -204,6 +185,12 @@ public class AccountFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 ((MainActivity) requireActivity()).replaceFragments(BasketFragment.class);
+                            }
+                        });
+                        myproducts.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((MainActivity) requireActivity()).replaceFragments(MyProductsFragment.class);
                             }
                         });
                         favorites.setOnClickListener(new View.OnClickListener() {
@@ -218,22 +205,28 @@ public class AccountFragment extends Fragment {
                                 ((MainActivity) requireActivity()).replaceFragments(MyOrdersFragment.class);
                             }
                         });
+                        if (user.getType().equals(Type.USER)) {
+                            notifications.setVisibility(View.GONE);
+                        }
                         notifications.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((MainActivity) requireActivity()).replaceFragments(NotificationsFragment.class);
+                                if (user.getType().equals(Type.ADMIN)) {
+                                    ((MainActivity) requireActivity()).replaceFragments(NotificationsFragment.class);
+                                } else {
+                                    ((MainActivity) requireActivity()).replaceFragments(CardFragment.class);
+                                }
                             }
                         });
                         settings.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 ((MainActivity) requireActivity()).replaceFragments(SettingsFragment.class);
-
                             }
                         });
                     }
                 }
-            }, 200);
+            }, 500);
 
         }
 
@@ -275,5 +268,4 @@ public class AccountFragment extends Fragment {
         }
 
     }
-
 }

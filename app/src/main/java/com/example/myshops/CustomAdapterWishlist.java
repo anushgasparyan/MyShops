@@ -4,10 +4,8 @@ package com.example.myshops;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.myshops.model.Product;
-import com.example.myshops.ui.home.HomeFragment;
 import com.example.myshops.ui.productshow.ProductShowFragment;
-import com.example.myshops.ui.wishlist.WishlistFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -80,7 +76,7 @@ public class CustomAdapterWishlist extends BaseAdapter {
 
         TextView nameTxt = view.findViewById(R.id.name);
         TextView price = view.findViewById(R.id.price);
-        TextView desc = view.findViewById(R.id.desc);
+        TextView desc = view.findViewById(R.id.feedback);
         Button del = view.findViewById(R.id.deletefrombasket);
         ImageView img = view.findViewById(R.id.icon);
 

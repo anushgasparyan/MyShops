@@ -1,7 +1,6 @@
 package com.example.myshops.ui.wishlist;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -18,11 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import com.example.myshops.CustomAdapterCard;
 import com.example.myshops.CustomAdapterWishlist;
 import com.example.myshops.MainActivity;
 import com.example.myshops.R;
-import com.example.myshops.model.Basket;
 import com.example.myshops.model.Product;
 import com.example.myshops.model.User;
 import com.example.myshops.model.Wishlist;
@@ -76,7 +73,7 @@ public class WishlistFragment extends Fragment {
             BottomNavigationView navigationView = (BottomNavigationView) getActivity().findViewById(R.id.nav_view);
             navigationView.getMenu().getItem(0).setChecked(true);
             ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
-        }else {
+        } else {
             ProgressDialog mProgressDialog = new ProgressDialog(getContext(), ProgressDialog.THEME_HOLO_LIGHT);
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setMessage("Please Wait...");
@@ -120,7 +117,7 @@ public class WishlistFragment extends Fragment {
                                             query1.addValueEventListener(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    if (snapshot.exists()){
+                                                    if (snapshot.exists()) {
                                                         for (DataSnapshot snapshotChild : snapshot.getChildren()) {
                                                             Product p = snapshotChild.getValue(Product.class);
                                                             in.add(p);
@@ -128,6 +125,7 @@ public class WishlistFragment extends Fragment {
                                                     }
                                                     customAdapter = new CustomAdapterWishlist(getContext(), in, email);
                                                     gridView.setAdapter(customAdapter);
+                                                    mProgressDialog.dismiss();
                                                 }
 
                                                 @Override
@@ -140,6 +138,7 @@ public class WishlistFragment extends Fragment {
                                 }
                             }
                         }
+
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
@@ -150,5 +149,4 @@ public class WishlistFragment extends Fragment {
         }
         return root;
     }
-
 }

@@ -1,7 +1,6 @@
 package com.example.myshops.ui.myproducts;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,21 +11,14 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.example.myshops.CustomAdapterCard;
-import com.example.myshops.MainActivity;
 import com.example.myshops.MyCustomAdapter;
 import com.example.myshops.R;
-import com.example.myshops.model.Basket;
 import com.example.myshops.model.Product;
 import com.example.myshops.model.User;
-import com.example.myshops.ui.home.HomeFragment;
-import com.example.myshops.ui.login.LoginFragment;
-import com.example.myshops.ui.myorders.MyOrdersViewModel;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,6 +42,11 @@ public class MyProductsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.my_products, container, false);
         GridView gridView = root.findViewById(R.id.simpleGridView);
+        setHasOptionsMenu(false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.titlebar2);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         String email = prefs.getString("email", "");
 
@@ -89,11 +86,11 @@ public class MyProductsFragment extends Fragment {
                             for (DataSnapshot child : snapshot.getChildren()) {
                                 Product product = child.getValue(Product.class);
                                 in.add(product);
-
                             }
                         }
                         customAdapter = new MyCustomAdapter(getContext(), in, email);
                         gridView.setAdapter(customAdapter);
+                        mProgressDialog.dismiss();
                     }
 
                     @Override
@@ -101,8 +98,7 @@ public class MyProductsFragment extends Fragment {
                     }
                 });
             }
-        }, 50);
-        mProgressDialog.dismiss();
+        }, 200);
         return root;
 }
 

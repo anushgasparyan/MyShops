@@ -43,7 +43,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentTitle(notification.getTitle())
                         .setContentText(notification.getBody())
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setSubText("Good")
                         .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
@@ -65,8 +64,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String s) {
         super.onNewToken(s);
         sendNotification(s);
-        Log.e("mysss", s);
-
     }
 
     private void sendNotification(String messageBody) {
@@ -80,7 +77,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_baseline_notifications_24)
-                        .setContentTitle("how are you")
+                        .setContentTitle("How are you")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
@@ -89,14 +86,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId,
                     "Channel human readable title",
                     NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
 

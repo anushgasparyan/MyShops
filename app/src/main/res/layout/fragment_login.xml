@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@mipmap/pinkbg_foreground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -17,12 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:fontFamily="@font/montaga"
+            android:fontFamily="cursive"
             android:textAlignment="center"
+            android:textColor="#000000"
             android:textSize="30sp" />
 
         <EditText
-            android:id="@+id/login"
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginLeft="30dp"
@@ -31,13 +30,14 @@
             android:background="@drawable/myinputs"
             android:drawableLeft="@drawable/email"
             android:ems="10"
-            android:fontFamily="@font/montaga"
+            android:fontFamily="cursive"
             android:hint="  Email"
             android:inputType="textPersonName"
-            android:paddingLeft="10dp" />
+            android:paddingLeft="10dp"
+            android:textColor="#000000" />
 
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/surname"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginLeft="30dp"
@@ -46,10 +46,11 @@
             android:background="@drawable/myinputs"
             android:drawableLeft="@drawable/ic_baseline_lock_24"
             android:ems="10"
-            android:fontFamily="@font/montaga"
+            android:fontFamily="cursive"
             android:hint="  Password"
             android:inputType="textPassword"
-            android:paddingLeft="10dp" />
+            android:paddingLeft="10dp"
+            android:textColor="#000000" />
 
         <Button
             android:id="@+id/change"
@@ -58,9 +59,9 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:background="@drawable/mybuttons"
-            android:fontFamily="@font/montaga"
+            android:fontFamily="cursive"
             android:text="Sign in"
-            android:textColor="#222222"
+            android:textColor="#000000"
             android:textSize="14sp" />
 
         <Button
@@ -72,8 +73,9 @@
             android:layout_marginRight="30dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/myinputs"
-            android:fontFamily="@font/montaga"
+            android:fontFamily="cursive"
             android:text="Sign up"
+            android:textColor="#000000"
             android:textSize="14sp" />
 
         <TextView
@@ -84,7 +86,7 @@
             android:fontFamily="@font/montaga"
             android:text="Forgot password?"
             android:textAlignment="center"
-            android:textColor="#ffffff"
+            android:textColor="#000000"
             android:textSize="16sp" />
 
 

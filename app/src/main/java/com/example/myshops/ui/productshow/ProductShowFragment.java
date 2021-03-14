@@ -3,11 +3,10 @@ package com.example.myshops.ui.productshow;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,22 +19,30 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myshops.CustomAdapterFeedback;
 import com.example.myshops.MainActivity;
 import com.example.myshops.R;
 import com.example.myshops.ViewPagerAdapter;
 import com.example.myshops.model.Basket;
 import com.example.myshops.model.Product;
+import com.example.myshops.model.Rating;
 import com.example.myshops.model.User;
 import com.example.myshops.model.Wishlist;
 import com.example.myshops.ui.basket.BasketFragment;
+import com.example.myshops.ui.card.CardFragment;
 import com.example.myshops.ui.home.HomeFragment;
 import com.example.myshops.ui.wishlist.WishlistFragment;
 import com.google.firebase.database.DataSnapshot;
@@ -45,32 +52,40 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class ProductShowFragment extends Fragment {
+    Context context;
     View root;
     User user;
     Product p;
-    String userid, productid, useremail, from;
-    AlertDialog.Builder builder;
-    AlertDialog.Builder alert;
-    Wishlist wishlist;
-    Wishlist wishlistt;
-    Basket basket;
-    Basket baskett;
+    ViewPagerAdapter mViewPagerAdapter;
+    String key, userid, productid, useremail, from;
+    AlertDialog.Builder builder, alert, rate;
+    Rating r, rating;
+    ArrayList<Rating> in = new ArrayList<>();
+    Wishlist wishlist, wishlistt;
+    Basket basket, baskett;
+    CustomAdapterFeedback customAdapterFeedback;
+    GridView gridView;
+    ProgressDialog mProgressDialog;
+    boolean b = false;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        context = getContext();
         root = inflater.inflate(R.layout.product_show_fragment, container, false);
         setHasOptionsMenu(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setCustomView(R.layout.titlebar2);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setCustomView(R.layout.titlebar2);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         productid = getActivity().getIntent().getStringExtra("productid");
         SharedPreferences prefs = getActivity().getSharedPreferences("MYPREF", MODE_PRIVATE);
         useremail = prefs.getString("email", "");
@@ -78,6 +93,7 @@ public class ProductShowFragment extends Fragment {
         from = prefs.getString("from", "");
 
         alert = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+
         alert.setMessage("Product is out of stock!")
                 .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
@@ -86,6 +102,11 @@ public class ProductShowFragment extends Fragment {
                     }
                 });
         AlertDialog dialog = alert.create();
+
+        rate = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+        View view = inflater.inflate(R.layout.alertrate, null);
+        rate.setView(view);
+        AlertDialog dialog1 = rate.create();
 
         DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("user");
         Query query2 = databaseReference2.orderByChild("email").equalTo(useremail);
@@ -119,12 +140,107 @@ public class ProductShowFragment extends Fragment {
             alertDialog.show();
         }
 
+        RatingBar ratingBar = root.findViewById(R.id.rating);
+        TextView myrate = root.findViewById(R.id.myrate);
+        gridView = root.findViewById(R.id.feedback);
+        TextView feedback = view.findViewById(R.id.message);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference databaseReference3 = FirebaseDatabase.getInstance().getReference("rating");
+                Query query3 = databaseReference3.orderByChild("userID").equalTo(user.getId());
+                query3.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot child : snapshot.getChildren()) {
+                                rating = child.getValue(Rating.class);
+                                if (rating.getProductID().equals(p.getId())) {
+                                    ratingBar.setRating((float) rating.getRating());
+                                    myrate.setText("Your rating` " + rating.getRating());
+                                    key = child.getKey();
+                                    rating.setId(key);
+                                    b = true;
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1500);
+
         ViewPager viewPager = root.findViewById(R.id.viewPage);
         ImageView basketicon = root.findViewById(R.id.basket);
         ImageView wish = root.findViewById(R.id.wish);
         TextView product_name = root.findViewById(R.id.product_name);
         TextView product_desc = root.findViewById(R.id.product_desc);
         TextView product_price = root.findViewById(R.id.product_price);
+        TextView cancel = view.findViewById(R.id.cancel);
+        TextView send = view.findViewById(R.id.send);
+        Button buy = root.findViewById(R.id.buy);
+        RatingBar ratingbar = view.findViewById(R.id.ratingBar);
+        ratingBar.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    dialog1.show();
+                }
+                return true;
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        send.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+                if (!b) {
+                    String f = "" + feedback.getText();
+                    float d = ratingbar.getRating();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("rating").push();
+                    r = new Rating();
+                    r.setUserID(user.getId());
+                    r.setProductID(p.getId());
+                    r.setId_id(user.getId() + "" + p.getId());
+                    r.setRating(d);
+                    r.setFeedback(f);
+                    ratingBar.setRating(d);
+                    Toast.makeText(getContext(), "Thanks for rating!", Toast.LENGTH_LONG).show();
+                    myrate.setText("Your rating` " + d);
+                    databaseReference.setValue(r);
+                } else {
+                    DatabaseReference databaseReference3 = FirebaseDatabase.getInstance().getReference("rating");
+                    bringRating();
+                    databaseReference3.child(rating.getId()).removeValue();
+                    String f = "" + feedback.getText();
+                    float d = ratingbar.getRating();
+                    r = new Rating();
+                    r.setUserID(user.getId());
+                    r.setProductID(p.getId());
+                    r.setId_id(user.getId() + "" + p.getId());
+                    r.setRating(d);
+                    r.setFeedback(f);
+                    ratingBar.setRating(d);
+                    Toast.makeText(getContext(), "Rating updated!", Toast.LENGTH_LONG).show();
+                    myrate.setText("Your rating` " + d);
+                    databaseReference3.push().setValue(r);
+                    rating();
+                }
+            }
+        });
         TextView count = root.findViewById(R.id.count);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("product");
         Query query = databaseReference.orderByChild("id").equalTo(productid);
@@ -136,7 +252,7 @@ public class ProductShowFragment extends Fragment {
                     for (DataSnapshot child : snapshot.getChildren()) {
                         p = child.getValue(Product.class);
                         List<String> images = p.getProductImgs();
-                        ViewPagerAdapter mViewPagerAdapter = new ViewPagerAdapter(getContext(), images);
+                        mViewPagerAdapter = new ViewPagerAdapter(context, images);
                         viewPager.setAdapter(mViewPagerAdapter);
                         product_name.setText(p.getName());
                         product_desc.setText(p.getDesc());
@@ -158,8 +274,8 @@ public class ProductShowFragment extends Fragment {
             }
         });
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        Handler handler1 = new Handler();
+        handler1.postDelayed(new Runnable() {
             @Override
             public void run() {
                 DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("wishlist");
@@ -180,7 +296,7 @@ public class ProductShowFragment extends Fragment {
                     }
                 });
             }
-        }, 1000);
+        }, 500);
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -193,7 +309,7 @@ public class ProductShowFragment extends Fragment {
                     wish.setTag(R.drawable.heart_not_filled);
                 }
             }
-        }, 500);
+        }, 1000);
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -216,7 +332,7 @@ public class ProductShowFragment extends Fragment {
                     }
                 });
             }
-        }, 1000);
+        }, 500);
 
         handler.postDelayed(new Runnable() {
             @Override
@@ -229,8 +345,8 @@ public class ProductShowFragment extends Fragment {
                     basketicon.setTag(R.drawable.cart_not_filled);
                 }
             }
-        }, 500);
-        ProgressDialog mProgressDialog = new ProgressDialog(getContext(), ProgressDialog.THEME_HOLO_LIGHT);
+        }, 1000);
+        mProgressDialog = new ProgressDialog(getContext(), ProgressDialog.THEME_HOLO_LIGHT);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setMessage("Please Wait...");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -252,7 +368,7 @@ public class ProductShowFragment extends Fragment {
                         basketicon.setImageResource(R.drawable.cart__filled);
                         Toast.makeText(getContext(), "Product added to the basket!", Toast.LENGTH_LONG).show();
                         mProgressDialog.dismiss();
-                    }else {
+                    } else {
                         dialog.show();
                     }
                 } else if (basketicon.getTag().equals(R.drawable.cart__filled)) {
@@ -291,7 +407,7 @@ public class ProductShowFragment extends Fragment {
                         wish.setImageResource(R.drawable.heart_filled);
                         Toast.makeText(getContext(), "Product added to the wishlist!", Toast.LENGTH_LONG).show();
                         mProgressDialog.dismiss();
-                    }else {
+                    } else {
                         dialog.show();
                     }
                 } else if (wish.getTag().equals(R.drawable.heart_filled)) {
@@ -311,21 +427,28 @@ public class ProductShowFragment extends Fragment {
                 }
             }
         });
+
+        rating();
+
+        buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) requireActivity()).replaceFragments(CardFragment.class);
+            }
+        });
         return root;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-//            finish();
-            if (from.equals("home")){
+            if (from.equals("home")) {
                 ((MainActivity) requireActivity()).replaceFragments(HomeFragment.class);
-            }else if(from.equals("basket")){
+            } else if (from.equals("basket")) {
                 ((MainActivity) requireActivity()).replaceFragments(BasketFragment.class);
-            }else if (from.equals("wishlist")){
+            } else if (from.equals("wishlist")) {
                 ((MainActivity) requireActivity()).replaceFragments(WishlistFragment.class);
             }
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -373,4 +496,54 @@ public class ProductShowFragment extends Fragment {
         });
     }
 
+    public void bringRating() {
+        DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("rating");
+        Query query1 = databaseReference1.orderByChild("id_id").equalTo(user.getId() + "" + p.getId());
+        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                        rating = childSnapshot.getValue(Rating.class);
+                        rating.setId(childSnapshot.getKey());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+    public void rating(){
+        in.clear();
+        DatabaseReference databasefeedback = FirebaseDatabase.getInstance().getReference("rating");
+        Query queryfeedback = databasefeedback.orderByChild("productID").equalTo(productid);
+        queryfeedback.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    mProgressDialog.show();
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        Rating r = child.getValue(Rating.class);
+                        in.add(r);
+                    }
+                    customAdapterFeedback = new CustomAdapterFeedback(getContext(), in, useremail);
+                    gridView.setAdapter(customAdapterFeedback);
+                    mProgressDialog.dismiss();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
 }

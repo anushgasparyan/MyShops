@@ -121,6 +121,7 @@ public class BasketFragment extends Fragment {
                                                     }
                                                     customAdapter = new CustomAdapterCard(getContext(), in, email);
                                                     gridView.setAdapter(customAdapter);
+                                                    mProgressDialog.dismiss();
                                                 }
 
                                                 @Override

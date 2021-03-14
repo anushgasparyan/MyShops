@@ -4,7 +4,6 @@ package com.example.myshops;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.myshops.model.Product;
-import com.example.myshops.ui.myproducts.MyProductsFragment;
 import com.example.myshops.ui.myproductsshow.MyProductsShowFragment;
-import com.example.myshops.ui.productshow.ProductShowFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -41,7 +38,7 @@ public class MyCustomAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public int getCount() {
-        return products.size();
+        return products == null ? 0 : products.size();
     }
 
     @Override
@@ -59,14 +56,14 @@ public class MyCustomAdapter extends BaseAdapter implements Filterable {
     public View getView(int i, View view, ViewGroup viewGroup) {
 
         if (view == null) {
-            view = LayoutInflater.from(c).inflate(R.layout.gridviewcard, viewGroup, false);
+            view = LayoutInflater.from(c).inflate(R.layout.gridviewmy, viewGroup, false);
         }
 
 
         final Product p = (Product) this.getItem(i);
 
         TextView nameTxt = view.findViewById(R.id.name);
-        TextView price = view.findViewById(R.id.desc);
+        TextView price = view.findViewById(R.id.price);
         ImageView img = view.findViewById(R.id.icon);
 
         nameTxt.setText(p.getName());
@@ -76,6 +73,7 @@ public class MyCustomAdapter extends BaseAdapter implements Filterable {
                 .transform(new RoundedCornersTransformation(10, 1))
                 .centerCrop()
                 .into(img);
+
 
 
         view.setOnClickListener(new View.OnClickListener() {

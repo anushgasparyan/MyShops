@@ -1,22 +1,18 @@
 package com.example.myshops.model;
 
-public class Rating {
+public class Order {
     private String id;
     private String productID;
     private String userID;
-    private float rating;
-    private String feedback;
     private String id_id;
 
-    public Rating() {
+    public Order() {
     }
 
-    public Rating(String id, String productID, String userID, float rating, String feedback, String id_id) {
+    public Order(String id, String productID, String userID, String id_id) {
         this.id = id;
         this.productID = productID;
         this.userID = userID;
-        this.rating = rating;
-        this.feedback = feedback;
         this.id_id = id_id;
     }
 
@@ -42,22 +38,6 @@ public class Rating {
 
     public void setUserID(String userID) {
         this.userID = userID;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
-
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
     }
 
     public String getId_id() {

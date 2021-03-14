@@ -306,7 +306,7 @@
                     android:id="@+id/textView22"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dress_table"
+                    android:text="Dressing_table"
                     android:visibility="invisible" />
 
             </LinearLayout>
