@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.example.myshops.model.Product;
 import com.example.myshops.model.Rating;
 import com.example.myshops.model.User;
 import com.google.firebase.database.DataSnapshot;
@@ -27,8 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class CustomAdapterFeedback extends BaseAdapter {
 
@@ -101,14 +97,16 @@ public class CustomAdapterFeedback extends BaseAdapter {
                 nameTxt.setText(user.getName() + " " + user.getSurname());
                 feedback.setText(r.getFeedback());
                 rating.setText(String.valueOf(r.getRating()));
-                Picasso.get().load(user.getUrl())
-                        .resize(60, 60)
-                        .centerCrop()
-                        .into(img);
+                if (user.getUrl() != null) {
+                    Picasso.get().load(user.getUrl())
+                            .resize(60, 60)
+                            .centerCrop()
+                            .into(img);
+                } else {
+                    img.setImageResource(R.drawable.person);
+                }
             }
         }, 1000);
-
-
         return view;
     }
 }

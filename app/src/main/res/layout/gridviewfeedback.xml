@@ -16,7 +16,7 @@
         android:layout_marginBottom="5dp"
         android:src="@drawable/person"
         app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp" />
+        app:civ_border_width="1dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
